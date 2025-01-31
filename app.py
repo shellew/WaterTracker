@@ -1,45 +1,48 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, session
+from flask import Flask, request, redirect, jsonify
 from WaterTracker import app
+from WaterTracker.database import init_db, update_goal, get_goal, record_intake, get_today_intake, get_history, reset_intake
+from datetime import datetime
 
-user_data = {
-    "daily_goal": '',
-    "total_intake": 0,
-}
+init_db()
 
-app.secret_key = 'water_reminder_app'
-
-@app.route('/')
-def index():
-    return render_template('/WaterTracker/index.html', daily_goal=user_data["daily_goal"], total_intake=user_data["total_intake"])
-
-@app.route('/set_goal', methods=['GET', 'POST'])
+@app.route('/set_goal', methods=['POST'])
 def set_goal():
-    if request.method == 'POST':
-        try:
-            session.permanent = True 
-            new_goal = int(request.form['daily_goal'])
-            user_data["daily_goal"] = new_goal
-            session["user_data"] = user_data["daily_goal"]
-            flash(f"Daily goal set to {new_goal} ml", "success")
-            return redirect(url_for('index'))
-        except ValueError:
-            flash("Please enter a valid number for the daily goal", "error")
-    return render_template('/WaterTracker/set_goal.html', daily_goal=user_data["daily_goal"])
+    data = request.json
+    daily_goal = data.get("daily_goal")
+    
+    if not isinstance(daily_goal, int) or daily_goal <= 0:
+        return jsonify({"error": "Invalid goal value"}), 400
 
-@app.route('/record_intake', methods=['GET', 'POST'])
-def record_intake():
-    if request.method == 'POST':
-        try:
-            intake = int(request.form['intake_amount'])
-            user_data["total_intake"] += intake
-            flash(f"Add {intake} ml to your total intake", "success")
-            return redirect(url_for('index'))
-        except ValueError:
-            flash("Please enter a valid number for the intake amount", "error")
-    return render_template('/WaterTracker/record_intake.html', total_intake=user_data["total_intake"])
+    update_goal(daily_goal)
+    return jsonify({"message": "Daily goal updated", "daily_goal": daily_goal})
+
+@app.route('/record_intake', methods=['POST'])
+def record_intake_route():
+    data = request.json
+    intake_amount = data.get("intake_amount")
+
+    if not isinstance(intake_amount, int) or intake_amount <= 0:
+        return jsonify({"error": "Invalid intake amount"}), 400
+
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    record_intake(intake_amount, timestamp)
+
+    return jsonify({"message": f"Recorded {intake_amount} ml", "intake_amount": intake_amount})
+
+@app.route('/get_today_intake', methods=['GET'])
+def get_today_intake_route():
+    today_date = datetime.now().strftime("%Y-%m-%d")
+    total_intake = get_today_intake(today_date)
+    daily_goal = get_goal()
+
+    return jsonify({"total_intake": total_intake, "daily_goal": daily_goal})
+
+@app.route('/get_history', methods=['GET'])
+def get_history_route():
+    history = get_history()
+    return jsonify({"history": history})
 
 @app.route('/reset_intake', methods=['POST'])
-def reset_intake():
-    user_data["total_intake"] = 0
-    flash("Total intake has been reset.", "success")
-    return redirect(url_for('index'))
+def reset_intake_route():
+    reset_intake()
+    return jsonify({"message": "Water intake data reset"})
