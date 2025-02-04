@@ -2,30 +2,25 @@
 
 {% block content %}
 <h1>index</h1>
-<form action="/set_goal" method="post">
-    <input type="number" name="daily_goal" id="daily_goal">
-    <button type="submit">設定</button>
-</form>
-<form action="/record_intake" method="post">
-    <select name="intake_amount" id="intake_amount">
-        <option value="100">100</option>
-        <option value="250">250</option>
-        <option value="500">500</option>
-    </select>
-    <button type="submit">記録</button>
-</form>
-<form action="/reset_intake" method="post">
-    <button type="submit" name="reset", id="reset">リセット</button>
-</form>
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
-目標量: {{ daily_goal }}
-総摂取量: {{ total_intake }}
+
+<label for="daily_goal">目標摂取量 (ml):</label>
+<input type="number" id="daily_goal">
+<button onclick="setGoal()">設定</button>
+
+<h2>記録</h2>
+
+<select id="intake_amount">
+    <option value="100">100</option>
+    <option value="250">250</option>
+    <option value="500">500</option>
+</select>
+<button onclick="recordIntake()">記録</button>
+
+<button onclick="resetIntake()">リセット</button>
+
+<h2>現在の状況</h2>
+<p>目標量: <span id="display_goal">0</span> ml</p>
+<p>総摂取量: <span id="display_total">0</span> ml</p>
+
+<script src="{{ url_for('static', filename=js/main.js) }}"></script>
 {% endblock %}
