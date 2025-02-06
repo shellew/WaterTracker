@@ -1,8 +1,6 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h1>index</h1>
-
 <label for="daily_goal">目標摂取量 (ml):</label>
 <input type="number" id="daily_goal">
 <button onclick="setGoal()">設定</button>
@@ -22,5 +20,5 @@
 <p>目標量: <span id="display_goal">0</span> ml</p>
 <p>総摂取量: <span id="display_total">0</span> ml</p>
 
-<script src="{{ url_for('static', filename=js/main.js) }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}

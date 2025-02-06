@@ -3,7 +3,7 @@
     "short_name": "水分トラッカー",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "007BFF",
+    "background_color": "#007BFF",
     "icons": [
         {
             "src": "/static/images/icon-192.png",

@@ -1,18 +1,18 @@
-const API_BASE_URL = "http://127.0.0.1:5000";
+const API_BASE_URL = process.env.API_BASE_URL || "http://127.0.0.1:5000";
 
 function setGoal() {
     const dailyGoal = document.getElementById("daily_goal").value;
     fetch(`${API_BASE_URL}/set_goal`, {
         method: "POST",
-        header: { "Content-Type": "application/json" },
-        body: JSON.stiringify({ daily_goal: dailyGoal })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ daily_goal: dailyGoal })
     })
     .then(response => response.json())
     .then(data => {
         alert(data.message);
         updateDisplay();
     })
-    .catch(error => console.error("Error:", error))
+    .catch(error => console.error("Error:", error));
 }
 
 function recordIntake() {

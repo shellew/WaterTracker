@@ -1,6 +1,10 @@
-from flask import Flask, request, redirect, jsonify
-from WaterTracker import app
+from flask import Flask, request, redirect, jsonify, render_template, send_file
 from datetime import datetime
+from flask_cors import CORS
+import os
+
+app = Flask(__name__)
+CORS(app)
 
 
 user_data = {
@@ -28,3 +32,20 @@ def reset_intake():
 @app.route('/get_status', methods=['GET'])
 def get_status():
     return jsonify(user_data)
+
+@app.route('/')
+def index():
+    return render_template("/WaterTracker/index.html")
+
+@app.route('/manifest.json')
+def serve_manifest():
+    return send_file('static/manifest.json', mimetype='application/manifest+json')
+
+@app.route('/service-worker.js')
+def serve_sw():
+    return send_file('static/service-worker.js', mimetype='application/javascript')
+
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(port=port)
