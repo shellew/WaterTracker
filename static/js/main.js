@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.API_BASE_URL || "http://127.0.0.1:5000";
+const API_BASE_URL = window.location.hostname === "localhost" ? "http://127.0.0.1:5000" : "https://watertracker-uj6t.onrender.com"
 
 function setGoal() {
     const dailyGoal = document.getElementById("daily_goal").value;
